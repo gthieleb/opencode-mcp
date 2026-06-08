@@ -1,6 +1,6 @@
 # Tools Reference
 
-Complete reference for all 80 tools provided by opencode-mcp.
+Complete reference for all 87 tools provided by opencode-mcp.
 
 Every tool accepts an optional `directory` parameter (absolute path) to target a specific project. All tools include [MCP tool annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations) (`readOnlyHint`, `destructiveHint`) so clients can make informed decisions about tool safety.
 

@@ -9,7 +9,7 @@
 
 opencode-mcp is an MCP server that bridges your AI tools (Claude, Cursor, Windsurf, VS Code, etc.) to OpenCode's headless API. It lets your AI delegate real coding work — building features, debugging, refactoring, running tests — to OpenCode sessions that autonomously read, write, and execute code in your project.
 
-**80 tools** | **10 resources** | **6 prompts** | **Multi-project** | **Auto-start**
+**87 tools** | **10 resources** | **6 prompts** | **Multi-project** | **Auto-start**
 
 ## Why Use This?
 
@@ -58,7 +58,7 @@ Your MCP client calls tools over stdio. This server translates them into HTTP re
 
 ## Key Tools
 
-The 80 tools are organized into tiers. Start with the workflow tools — they handle the common patterns in a single call.
+The 87 tools are organized into tiers. Start with the workflow tools — they handle the common patterns in a single call.
 
 ### Workflow Tools (13) — Start Here
 
@@ -111,6 +111,7 @@ opencode_check({ sessionId: "..." })
 | [Provider & Auth](docs/tools.md#provider--auth-tools) | 6 | List providers/models, set API keys, OAuth |
 | [Config](docs/tools.md#config-tools) | 3 | Get/update configuration |
 | [Project](docs/tools.md#project-tools) | 3 | List, inspect, and initialize projects |
+| [Workspace](docs/tools.md#workspace-tools) | 7 | List, create, remove, warp, and sync workspaces |
 | [Events](docs/tools.md#event-tools) | 1 | Poll real-time SSE events |
 
 ### Resources (10)
@@ -198,7 +199,7 @@ npm run build && node scripts/mcp-smoke-test.mjs
 
 - [Getting Started](docs/getting-started.md) — step-by-step setup
 - [Configuration](docs/configuration.md) — env vars and all client configs
-- [Tools Reference](docs/tools.md) — all 80 tools in detail
+- [Tools Reference](docs/tools.md) — all 87 tools in detail
 - [Resources](docs/resources.md) — 10 MCP resources
 - [Prompts](docs/prompts.md) — 6 guided workflow templates
 - [Examples](docs/examples.md) — real workflow examples

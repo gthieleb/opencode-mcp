@@ -9,6 +9,7 @@ import { registerMessageTools } from "../src/tools/message.js";
 import { registerFileTools } from "../src/tools/file.js";
 import { registerProjectTools } from "../src/tools/project.js";
 import { registerProviderTools } from "../src/tools/provider.js";
+import { registerWorkspaceTools } from "../src/tools/workspace.js";
 
 // ─── Mock client factory ─────────────────────────────────────────────────
 
@@ -2260,6 +2261,144 @@ describe("Tool handlers", () => {
       const handler = tools.get("opencode_status")!;
       const result = await handler({});
       expect(result.isError).toBeUndefined();
+    });
+  });
+
+  describe("workspace tools", () => {
+    describe("opencode_workspace_list", () => {
+      it("returns formatted workspace list", async () => {
+        const mockClient = createMockClient({
+          get: vi.fn().mockResolvedValue([
+            { id: "ws-1", name: "Workspace 1", type: "git", branch: "main" },
+            { id: "ws-2", name: "Workspace 2", type: "local" },
+          ]),
+        });
+        const tools = new Map<string, Function>();
+        const mockServer = {
+          tool: vi.fn((...args: unknown[]) => {
+            tools.set(args[0] as string, args[args.length - 1] as Function);
+          }),
+        } as unknown as McpServer;
+        registerWorkspaceTools(mockServer, mockClient);
+
+        const handler = tools.get("opencode_workspace_list")!;
+        const result = await handler({});
+        expect(result.content[0].text).toContain("Workspaces (2)");
+        expect(result.content[0].text).toContain("Workspace 1 (git) [main]");
+        expect(result.content[0].text).toContain("Workspace 2 (local)");
+      });
+
+      it("returns message for empty list", async () => {
+        const mockClient = createMockClient({
+          get: vi.fn().mockResolvedValue([]),
+        });
+        const tools = new Map<string, Function>();
+        const mockServer = {
+          tool: vi.fn((...args: unknown[]) => {
+            tools.set(args[0] as string, args[args.length - 1] as Function);
+          }),
+        } as unknown as McpServer;
+        registerWorkspaceTools(mockServer, mockClient);
+
+        const handler = tools.get("opencode_workspace_list")!;
+        const result = await handler({});
+        expect(result.content[0].text).toContain("No workspaces found");
+      });
+
+      it("returns error on failure", async () => {
+        const mockClient = createMockClient({
+          get: vi.fn().mockRejectedValue(new Error("Server error")),
+        });
+        const tools = new Map<string, Function>();
+        const mockServer = {
+          tool: vi.fn((...args: unknown[]) => {
+            tools.set(args[0] as string, args[args.length - 1] as Function);
+          }),
+        } as unknown as McpServer;
+        registerWorkspaceTools(mockServer, mockClient);
+
+        const handler = tools.get("opencode_workspace_list")!;
+        const result = await handler({});
+        expect(result.isError).toBe(true);
+        expect(result.content[0].text).toContain("Server error");
+      });
+    });
+
+    describe("opencode_workspace_create", () => {
+      it("creates workspace with required type", async () => {
+        const mockClient = createMockClient({
+          post: vi.fn().mockResolvedValue({ id: "ws-3", name: "ws-3", type: "git", branch: "dev" }),
+        });
+        const tools = new Map<string, Function>();
+        const mockServer = {
+          tool: vi.fn((...args: unknown[]) => {
+            tools.set(args[0] as string, args[args.length - 1] as Function);
+          }),
+        } as unknown as McpServer;
+        registerWorkspaceTools(mockServer, mockClient);
+
+        const handler = tools.get("opencode_workspace_create")!;
+        const result = await handler({ type: "git", branch: "dev" });
+        expect(result.content[0].text).toContain("Workspace created");
+        expect(result.content[0].text).toContain("ws-3");
+        expect(result.content[0].text).toContain("git");
+        expect(result.content[0].text).toContain("dev");
+      });
+
+      it("returns error on failure", async () => {
+        const mockClient = createMockClient({
+          post: vi.fn().mockRejectedValue(new Error("Invalid type")),
+        });
+        const tools = new Map<string, Function>();
+        const mockServer = {
+          tool: vi.fn((...args: unknown[]) => {
+            tools.set(args[0] as string, args[args.length - 1] as Function);
+          }),
+        } as unknown as McpServer;
+        registerWorkspaceTools(mockServer, mockClient);
+
+        const handler = tools.get("opencode_workspace_create")!;
+        const result = await handler({ type: "invalid" });
+        expect(result.isError).toBe(true);
+        expect(result.content[0].text).toContain("Invalid type");
+      });
+    });
+
+    describe("opencode_workspace_remove", () => {
+      it("removes workspace by id", async () => {
+        const mockClient = createMockClient({
+          delete: vi.fn().mockResolvedValue(undefined),
+        });
+        const tools = new Map<string, Function>();
+        const mockServer = {
+          tool: vi.fn((...args: unknown[]) => {
+            tools.set(args[0] as string, args[args.length - 1] as Function);
+          }),
+        } as unknown as McpServer;
+        registerWorkspaceTools(mockServer, mockClient);
+
+        const handler = tools.get("opencode_workspace_remove")!;
+        const result = await handler({ id: "ws-1" });
+        expect(result.content[0].text).toContain("Workspace ws-1 removed");
+      });
+
+      it("returns error on failure", async () => {
+        const mockClient = createMockClient({
+          delete: vi.fn().mockRejectedValue(new Error("Not found")),
+        });
+        const tools = new Map<string, Function>();
+        const mockServer = {
+          tool: vi.fn((...args: unknown[]) => {
+            tools.set(args[0] as string, args[args.length - 1] as Function);
+          }),
+        } as unknown as McpServer;
+        registerWorkspaceTools(mockServer, mockClient);
+
+        const handler = tools.get("opencode_workspace_remove")!;
+        const result = await handler({ id: "ws-missing" });
+        expect(result.isError).toBe(true);
+        expect(result.content[0].text).toContain("Not found");
+      });
     });
   });
 });

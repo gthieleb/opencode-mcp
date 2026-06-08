@@ -9,7 +9,7 @@
  * providers, and more.
  *
  * Features:
- *  - 80 tools covering the entire OpenCode API surface
+ *  - 87 tools covering the entire OpenCode API surface
  *  - High-level workflow tools (opencode_ask, opencode_reply, etc.)
  *  - Smart response formatting for LLM-friendly output
  *  - MCP Resources for browseable project data
@@ -38,6 +38,7 @@ import { setModelDefaults } from "./helpers.js";
 import { registerGlobalTools } from "./tools/global.js";
 import { registerConfigTools } from "./tools/config.js";
 import { registerProjectTools } from "./tools/project.js";
+import { registerWorkspaceTools } from "./tools/workspace.js";
 import { registerSessionTools } from "./tools/session.js";
 import { registerMessageTools } from "./tools/message.js";
 import { registerFileTools } from "./tools/file.js";
@@ -82,7 +83,7 @@ const server = new McpServer(
       "# OpenCode MCP — Guide for LLM Clients",
       "",
       "You are connected to OpenCode, an autonomous AI coding agent that can build, edit, and debug software projects.",
-      "This server exposes ~80 tools organized into tiers. Use high-level tools first; drop to low-level only when needed.",
+      "This server exposes ~87 tools organized into tiers. Use high-level tools first; drop to low-level only when needed.",
       "",
       "## Getting Started (First Time)",
       "1. Call `opencode_setup` — checks server health, shows configured providers, and suggests next steps.",
@@ -170,6 +171,7 @@ const server = new McpServer(
 registerGlobalTools(server, client);
 registerConfigTools(server, client);
 registerProjectTools(server, client);
+registerWorkspaceTools(server, client);
 registerSessionTools(server, client);
 registerMessageTools(server, client);
 registerFileTools(server, client);
