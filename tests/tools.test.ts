@@ -136,6 +136,19 @@ describe("Tool registration", () => {
       expect(tools.has("opencode_auth_set")).toBe(true);
     });
   });
+  describe("registerWorkspaceTools", () => {
+    it("registers all 7 workspace tools", () => {
+      const { tools } = captureTools(registerWorkspaceTools);
+      expect(tools.size).toBe(7);
+      expect(tools.has("opencode_workspace_list")).toBe(true);
+      expect(tools.has("opencode_workspace_create")).toBe(true);
+      expect(tools.has("opencode_workspace_remove")).toBe(true);
+      expect(tools.has("opencode_workspace_warp")).toBe(true);
+      expect(tools.has("opencode_workspace_status")).toBe(true);
+      expect(tools.has("opencode_workspace_sync_list")).toBe(true);
+      expect(tools.has("opencode_workspace_adapter_list")).toBe(true);
+    });
+  });
 });
 
 // ─── Tool handler tests ──────────────────────────────────────────────────

@@ -106,10 +106,11 @@ export function registerWorkspaceTools(
         const body: Record<string, unknown> = { sessionID };
         if (id) body.id = id;
         if (copyChanges !== undefined) body.copyChanges = copyChanges;
-        const result = await client.post("/experimental/workspace/warp", body, { directory });
-        const r = result as Record<string, unknown>;
-        const message = r.message ?? (r.detached ? "Detached from workspace." : "Warped into workspace.");
-        return toolResult(`${message}`);
+        await client.post("/experimental/workspace/warp", body, { directory });
+        const message = id
+          ? `Session ${sessionID} warped into workspace ${id}.`
+          : `Session ${sessionID} detached from workspace.`;
+        return toolResult(message);
       } catch (e) {
         return toolError(e);
       }
@@ -126,15 +127,16 @@ export function registerWorkspaceTools(
     async ({ directory }) => {
       try {
         const raw = await client.get("/experimental/workspace/status", undefined, directory);
-        const statuses = raw && typeof raw === "object" && !Array.isArray(raw)
-          ? raw as Record<string, unknown>
-          : {};
-        const entries = Object.entries(statuses);
-        if (entries.length === 0) {
+        const statuses = Array.isArray(raw) ? raw as Array<Record<string, unknown>> : [];
+        if (statuses.length === 0) {
           return toolResult("No workspace status available.");
         }
-        const lines = entries.map(([workspaceID, status]) => `- ${workspaceID}: ${status}`);
-        return toolResult(`## Workspace Status (${entries.length})\n${lines.join("\n")}`);
+        const lines = statuses.map((s) => {
+          const id = s.workspaceID ?? s.id ?? "unknown";
+          const status = s.status ?? "unknown";
+          return `- ${id}: ${status}`;
+        });
+        return toolResult(`## Workspace Status (${statuses.length})\n${lines.join("\n")}`);
       } catch (e) {
         return toolError(e);
       }
@@ -147,6 +149,7 @@ export function registerWorkspaceTools(
     {
       directory: directoryParam,
     },
+    readOnly,
     async ({ directory }) => {
       try {
         await client.post("/experimental/workspace/sync-list", undefined, { directory });
